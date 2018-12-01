@@ -2,15 +2,14 @@ package com.withpwn;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class HtmlPainter extends JFrame implements ActionListener {
-    Scanner sc = new Scanner(System.in);
-
     TargetImage targetImage;
     OutputHTML outputHTML;
     int returnVal;
@@ -27,6 +26,10 @@ public class HtmlPainter extends JFrame implements ActionListener {
     JButton button1 = new JButton("Output Path");
     JButton Paint = new JButton("Paint!");
 
+    JLabel label = new JLabel("Choose Target Image");
+    JLabel label1 = new JLabel("Input Output Path");
+    JLabel label2 = new JLabel("Paint?");
+
     HtmlPainter() throws IOException {
         setTitle("Html-Painter");
         setSize(800, 400);
@@ -36,18 +39,32 @@ public class HtmlPainter extends JFrame implements ActionListener {
         button1.addActionListener(this);
         Paint.addActionListener(this);
 
+        button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        button1.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        Paint.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
+        label.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        label1.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        label2.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new JLabel("Choose Target Image"));
+        panel.add(label);
         panel.add(button);
 
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
-        panel1.add(new JLabel("Input Output Path"));
+        panel1.add(label1);
         panel1.add(button1);
 
         panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-        panel2.add(new JLabel("Paint?"));
+        panel2.add(label2);
         panel2.add(Paint);
 
+        setLayout(new FlowLayout(FlowLayout.CENTER, 50, 100));
+        add(panel);
+        add(panel1);
+        add(panel2);
+
+        setResizable(false);
         setVisible(true);
     }
 
@@ -81,18 +98,21 @@ public class HtmlPainter extends JFrame implements ActionListener {
                 System.exit(0);
             }
         } else if (e.getSource() == Paint) {
-            // Confirm
-            System.out.print("[*] Start Paint? [y/n]: ");
-            String YorN = sc.next();
-            if (YorN.equals("y") || YorN.equals("Y")) {
-                outputHTML.Insert2Buf(targetImage);
+            outputHTML.Insert2Buf(targetImage);
+            try {
                 outputHTML.WriteInFile(file);
-            } else {
-                System.out.println("[*] Canceled");
-                System.exit(0);
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
             }
 
             System.out.println("[*] All process finished. Enjoy yourself!");
+
+            this.dispose();
+            try {
+                new HtmlPainter();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }
